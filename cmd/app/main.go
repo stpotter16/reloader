@@ -24,7 +24,10 @@ func main() {
 
 func indexGet(filePath string) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
-        htmlContent, _ := readFile(filePath)
+        htmlContent, err := readFile(filePath)
+        if err != nil {
+            http.Error(w, "Unable to read html file", http.StatusInternalServerError)
+        }
         fmt.Fprint(w, htmlContent)
     }
 }
