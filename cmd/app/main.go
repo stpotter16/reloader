@@ -19,11 +19,18 @@ func main() {
     options := parseOptions()
 
     // Initialize the background go function for watching file updates
+    messages := make(chan string)
+    go func() { 
+        for {
+            messages <- time.Now().Format(time.RFC1123)
+            time.Sleep(time.Second * 2)
+        }
+    }()
 
     // Initialize and run the server
     mux := http.NewServeMux()
     mux.HandleFunc("GET /{$}", indexGet(options.filePath))
-    mux.HandleFunc("/events", events())
+    mux.HandleFunc("/events", events(messages))
     addr := fmt.Sprintf(":%d", options.port)
     log.Printf("Serving on %s", addr)
     http.ListenAndServe(addr, mux)
@@ -59,16 +66,15 @@ func readFile(filePath string) (string, error) {
     return string(data), nil
 }
 
-func events() http.HandlerFunc {
+func events(messages chan string) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         w.Header().Add("Content-Type", "text/event-stream")
         w.Header().Add("Cache-Control", "no-cache")
 
         for {
-            dateInfo := time.Now().Format(time.RFC1123)
+            dateInfo := <- messages
             fmt.Fprintf(w, "data: %s", fmt.Sprintf("Event: %s\n\n", dateInfo))
             w.(http.Flusher).Flush()
-            time.Sleep(time.Second * 2)
         }
     }
 }
