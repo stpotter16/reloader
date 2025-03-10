@@ -4,8 +4,24 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta http-equiv="X-UA-Compatibale" content="ie-edge"/>
+        <script>
+            const eventSource = new EventSource("/events");
+            console.log(eventSource);
+            eventSource.onmessage = (event) => {
+                console.log("received an event");
+                const newElement = document.createElement("li");
+                const listElement = document.getElementById("list");
+                console.log(listElement);
+
+                newElement.textContent = `message: ${event.data}`;
+                console.log(newElement);
+                listElement.appendChild(newElement);
+            };
+        </script>
     </head>
     <body>
         <h1>Hello, World!</h1>
+        <h2>Event data:</h2>
+        <ul id="list"></ul>
     </body>
 </html>
