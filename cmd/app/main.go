@@ -22,8 +22,17 @@ func main() {
     http.ListenAndServe(":8080", mux)
 }
 
-func indexGet(_ string) http.HandlerFunc {
+func indexGet(filePath string) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprint(w, "Hello, World!")
+        htmlContent, _ := readFile(filePath)
+        fmt.Fprint(w, htmlContent)
     }
+}
+
+func readFile(filePath string) (string, error) {
+    data, err := os.ReadFile(filePath)
+    if err != nil {
+        return "", err
+    }
+    return string(data), nil
 }
