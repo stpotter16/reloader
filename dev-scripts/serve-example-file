@@ -9,4 +9,4 @@ set -u
 # Echo commands
 set -x
 
-make build && ./tmp/main -file=./examples/index.html
+make build && ./tmp/main -file=examples/index.html
